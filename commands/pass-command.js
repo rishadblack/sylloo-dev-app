@@ -13,28 +13,21 @@ import { writeFile, mkdir } from "fs/promises";
 import { join, basename, dirname } from "path";
 
 const passCommand = program
-  .command("command <project> <module>")
+  .command("command <project> <module> <commandName...>")
   .description("Pass command to server")
-  .action(async (project, module) => {
+  .action(async (project, module, commandName) => {
+    const fullCommand = commandName.join(" "); // Combine all extra arguments into a single string
     const projectData = await updateProject(project, module);
 
     try {
-      const credentials = await inquirer.prompt([
-        {
-          type: "input",
-          name: "command",
-          message: "Enter command to run:",
-        },
-      ]);
-
       const response = await runCommand({
-        command: credentials.command,
+        command: fullCommand,
         module: module,
       });
 
       // Check if the request was successful and save the JSON data to a file
       if (response) {
-        if (credentials.command.includes("artisan make")) {
+        if (fullCommand.includes("make")) {
           // Define the directory to watch and the API endpoint to upload to
           const watchDirectory = `./projects/${projectData[project].dir_name}/${projectData[project]["modules"][module].dir_name}`; // Change this to your desired directory
 
