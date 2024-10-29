@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { program } from "commander";
+import { Command } from "commander";
+import inquirer from "inquirer";
 import {
   postModuleApp,
   updateProject,
@@ -7,10 +8,25 @@ import {
   handleErrorMessage,
 } from "../app/utils.js";
 
-const passCommand = program
-  .command("session <project>")
+const passCommand = new Command("session")
+  .argument("<project>", "Project name to sync")
   .description("Develop in a session with the server")
   .action(async (project) => {
+    // Check if project or module are not provided
+    if (!project) {
+      // Prompt for missing arguments
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "project",
+          message: "Enter the project name:",
+          when: () => !project, // Prompt if project is not provided
+        },
+      ]);
+
+      // Use provided arguments or answers from prompts
+      project = project || answers.project;
+    }
     const projectData = await updateProject(project);
 
     try {

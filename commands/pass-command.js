@@ -1,6 +1,6 @@
 // commands/download.js
 import "dotenv/config";
-import { program } from "commander";
+import { Command } from "commander";
 import {
   postModuleApp,
   updateProject,
@@ -12,10 +12,35 @@ import inquirer from "inquirer";
 import { writeFile, mkdir } from "fs/promises";
 import { join, basename, dirname } from "path";
 
-const passCommand = program
-  .command("command <project> <module> <commandName...>")
+const passCommand = new Command("command")
+  .argument("[project]", "Project name to sync")
+  .argument("[module]", "Module name to sync with project")
+  .argument("<commandName...>", "Command name to pass")
   .description("Pass command to server")
   .action(async (project, module, commandName) => {
+    // Check if project or module are not provided
+    if (!project || !module) {
+      // Prompt for missing arguments
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "project",
+          message: "Enter the project name:",
+          when: () => !project, // Prompt if project is not provided
+        },
+        {
+          type: "input",
+          name: "module",
+          message: "Enter the module name:",
+          when: () => !module, // Prompt if module is not provided
+        },
+      ]);
+
+      // Use provided arguments or answers from prompts
+      project = project || answers.project;
+      module = module || answers.module;
+    }
+
     const fullCommand = commandName.join(" "); // Combine all extra arguments into a single string
     const projectData = await updateProject(project, module);
 

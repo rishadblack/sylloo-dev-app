@@ -1,11 +1,10 @@
 import "dotenv/config"; // Load environment variables from .env file
-import { program } from "commander";
+import { Command } from "commander";
 import axios from "axios";
 import { setSession, handleErrorMessage } from "../app/utils.js";
 import inquirer from "inquirer";
 
-const loginCommand = program
-  .command("login")
+const loginCommand = new Command("login")
   .description("Log in and store authentication token")
   .action(async (action) => {
     try {

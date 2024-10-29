@@ -1,4 +1,5 @@
-import { program } from "commander";
+import { Command } from "commander";
+import inquirer from "inquirer";
 import {
   postModuleApp,
   updateProject,
@@ -10,10 +11,33 @@ import {
 import { readdir, stat, readFile, writeFile, mkdir } from "fs/promises";
 import { join, basename, dirname } from "path";
 
-const syncCommand = program
-  .command("sync <project> <module>")
+const syncCommand = new Command("sync")
+  .argument("[project]", "Project name to sync")
+  .argument("[module]", "Module name to sync with project")
   .description("Watch projects for changes and upload them")
   .action(async (project, module) => {
+    // Check if project or module are not provided
+    if (!project || !module) {
+      // Prompt for missing arguments
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "project",
+          message: "Enter the project name:",
+          when: () => !project, // Prompt if project is not provided
+        },
+        {
+          type: "input",
+          name: "module",
+          message: "Enter the module name:",
+          when: () => !module, // Prompt if module is not provided
+        },
+      ]);
+
+      // Use provided arguments or answers from prompts
+      project = project || answers.project;
+      module = module || answers.module;
+    }
     const projectData = await updateProject(project, module);
 
     // Define the directory to watch and the API endpoint to upload to

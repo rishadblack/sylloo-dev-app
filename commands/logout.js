@@ -1,10 +1,9 @@
 // commands/logout.js
 import "dotenv/config";
-import { program } from "commander";
+import { Command } from "commander";
 import { postWithToken, handleErrorMessage } from "../app/utils.js";
 
-const logoutCommand = program
-  .command("logout")
+const logoutCommand = new Command("logout")
   .description("Download a JSON file from the API")
   .action(async () => {
     try {

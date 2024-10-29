@@ -10,11 +10,11 @@ import logoutCommand from "./commands/logout.js";
 program.version("1.0.0").description("My CLI Tool");
 
 // Register your commands
-program.addCommand(loginCommand, { name: "login" });
-program.addCommand(passCommand, { name: "command" });
-program.addCommand(syncCommand, { name: "sync" });
-program.addCommand(webSession, { name: "session" });
-program.addCommand(watchCommand, { name: "watch" });
-program.addCommand(logoutCommand, { name: "logout" });
+program.addCommand(loginCommand);
+program.addCommand(passCommand);
+program.addCommand(syncCommand);
+program.addCommand(webSession);
+program.addCommand(watchCommand);
+program.addCommand(logoutCommand);
 
 program.parse(process.argv);

@@ -1,5 +1,6 @@
-import { program } from "commander";
+import { Command } from "commander";
 import { exec } from "child_process";
+import inquirer from "inquirer";
 import {
   postModuleApp,
   updateProject,
@@ -10,12 +11,36 @@ import chokidar from "chokidar";
 import { readFile, stat } from "fs/promises";
 import { basename, dirname } from "path"; // Import dirname function to get the directory name
 
-const watchCommand = program
-  .command("watch <project> [module]")
+const watchCommand = new Command("watch")
+  .argument("[project]", "Project name to sync")
+  .argument("[module]", "Module name to sync with project")
   .description(
     "Watch projects for changes and upload them for a specific project"
   )
   .action(async (project, module = null) => {
+    // Check if project or module are not provided
+    if (!project || !module) {
+      // Prompt for missing arguments
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "project",
+          message: "Enter the project name:",
+          when: () => !project, // Prompt if project is not provided
+        },
+        {
+          type: "input",
+          name: "module",
+          message: "Enter the module name:",
+          when: () => !module, // Prompt if module is not provided
+        },
+      ]);
+
+      // Use provided arguments or answers from prompts
+      project = project || answers.project;
+      module = module || answers.module;
+    }
+
     const projectData = await updateProject(project);
     const watchDirectory = `./projects/${projectData[project].dir_name}`; // Set the directory based on the project name
     if (module) {

@@ -2,6 +2,7 @@ import { readdir, stat, readFile, writeFile, access, mkdir } from "fs/promises";
 import md5File from "md5-file";
 import axios from "axios";
 import { join, basename, dirname } from "path";
+import https from "https";
 
 // Function to read a JSON file and extract the specified property
 async function setSession(data) {
@@ -165,6 +166,10 @@ async function getBearerToken() {
 }
 
 async function postWithToken(url, data = {}) {
+  const httpsAgent = new https.Agent({
+    rejectUnauthorized: false, // Disable SSL verification
+  });
+
   try {
     const response = await axios.post(
       `${process.env.BASE_URL}/api/${url}`,
@@ -173,6 +178,7 @@ async function postWithToken(url, data = {}) {
         headers: {
           Authorization: `Bearer ${await getBearerToken()}`,
         },
+        httpsAgent,
       }
     );
     return response.data;
